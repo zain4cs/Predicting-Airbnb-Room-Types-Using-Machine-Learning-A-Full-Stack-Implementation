@@ -2,7 +2,7 @@
    NYC Stay Classifier — Application logic
    ========================================================================== */
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://predicting-airbnb-room-types-using.onrender.com";
 
 const CLASS_ORDER = ["Entire home/apt", "Private room", "Shared room"];
 
