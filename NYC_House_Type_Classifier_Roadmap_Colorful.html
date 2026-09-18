@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NYC House Type Classifier | Build Roadmap</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#092746;
+  --navy2:#123e67;
+  --text:#17365d;
+  --muted:#617b99;
+  --bg:#f4f8fc;
+  --white:#fff;
+  --line:#dce8f2;
+  --teal:#13a9a1;
+  --cyan:#29c6e6;
+  --purple:#7257d9;
+  --orange:#ed8b2f;
+  --pink:#d94672;
+  --green:#16a085;
+  --shadow:0 8px 24px rgba(24,62,94,.08);
+}
+body{
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:
+    radial-gradient(circle at 10% 15%,rgba(41,198,230,.08),transparent 25%),
+    radial-gradient(circle at 90% 40%,rgba(114,87,217,.07),transparent 28%),
+    linear-gradient(180deg,#f9fcff 0%,var(--bg) 100%);
+  color:var(--text);
+  min-height:100vh;
+}
+button{font:inherit}
+.container{width:min(1100px,calc(100% - 30px));margin:auto;padding:25px 0 42px}
+
+/* HERO */
+.hero{
+  position:relative;overflow:hidden;
+  min-height:185px;padding:31px 38px;
+  border-radius:20px 20px 0 0;
+  color:white;
+  background:
+    linear-gradient(110deg,rgba(5,30,57,.97),rgba(12,60,96,.88)),
+    radial-gradient(circle at 85% 20%,#7c75e8,transparent 35%);
+  box-shadow:var(--shadow);
+}
+.hero:before{
+  content:"";position:absolute;inset:auto -5% -55px;
+  height:100px;
+  background:rgba(70,146,191,.22);
+  border-radius:50% 50% 0 0;
+  transform:rotate(-2deg);
+}
+.city{
+  position:absolute;right:0;bottom:0;width:48%;height:100%;
+  opacity:.22;
+  background:
+    linear-gradient(to top,transparent 0 30%,rgba(255,255,255,.8) 30% 31%,transparent 31%),
+    repeating-linear-gradient(90deg,transparent 0 24px,rgba(255,255,255,.7) 24px 28px,transparent 28px 52px);
+  clip-path:polygon(0 70%,6% 58%,11% 70%,17% 45%,22% 67%,29% 37%,34% 70%,40% 55%,45% 69%,51% 27%,56% 70%,64% 48%,69% 68%,75% 20%,80% 70%,87% 42%,93% 69%,100% 30%,100% 100%,0 100%);
+}
+.hero-content{position:relative;z-index:2;max-width:650px}
+.kicker{font-size:11px;font-weight:800;letter-spacing:1.2px;color:#65e8f1;text-transform:uppercase}
+.title{font-size:clamp(26px,5vw,38px);font-weight:850;line-height:1.05;margin-top:5px;letter-spacing:-1px}
+.title span{color:#4fe5f0}
+.subtitle{font-size:13px;color:#d7e8f6;margin-top:9px}
+.target{
+  position:absolute;right:35px;top:28px;z-index:3;
+  width:150px;padding:12px 15px;
+  border:1px solid rgba(117,208,255,.4);
+  border-radius:13px;background:rgba(9,39,70,.7);
+  backdrop-filter:blur(8px);
+}
+.target small{display:block;color:#9fc1da;font-size:9px;font-weight:800;text-transform:uppercase}
+.target strong{display:block;margin-top:4px;color:white;font-size:15px}
+.target em{display:block;color:#9fc1da;font-style:normal;font-size:9px;margin-top:2px}
+
+/* PROGRESS */
+.progress-card{
+  margin-top:0;padding:16px 20px;
+  background:var(--navy);color:white;
+  border-radius:0 0 14px 14px;
+  display:flex;align-items:center;gap:17px;
+  box-shadow:0 9px 22px rgba(7,39,70,.12);
+}
+.ring{
+  width:58px;height:58px;border-radius:50%;flex-shrink:0;
+  display:grid;place-items:center;
+  background:conic-gradient(#54dce9 0deg,#54dce9 0deg,#1e547d 0deg);
+  position:relative;
+}
+.ring:after{content:"";position:absolute;inset:6px;background:var(--navy);border-radius:50%}
+.ring span{position:relative;z-index:1;font-size:13px;font-weight:800}
+.progress-main{flex:1;min-width:150px}
+.progress-line{display:flex;justify-content:space-between;font-size:12px;font-weight:750;margin-bottom:8px}
+.progress-line .muted{color:#a9c4d9;font-weight:600}
+.bar{height:8px;background:#365f80;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;width:0;background:linear-gradient(90deg,#58ddea,#7a83f0);border-radius:99px;transition:.3s}
+.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.btn{
+  border:0;border-radius:10px;padding:9px 12px;cursor:pointer;
+  font-size:10px;font-weight:800;color:white;background:#416c9b;
+  transition:.15s
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.btn.complete{background:#18b7a7}.btn.reset{background:#c7486d}
+
+/* GRID */
+.grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;
+}
+.card{
+  border-radius:15px;overflow:hidden;background:white;
+  border:1px solid var(--card-border);
+  box-shadow:var(--shadow);
+}
+.card-head{
+  padding:13px 15px 11px;
+  background:linear-gradient(135deg,var(--card-bg),rgba(255,255,255,.85));
+  border-bottom:1px solid rgba(120,150,180,.16);
+}
+.head-row{display:flex;align-items:center;gap:10px}
+.icon{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  color:white;background:var(--card-color);font-size:19px;font-weight:900;
+  box-shadow:0 4px 10px color-mix(in srgb,var(--card-color) 25%,transparent);
+}
+.stop{font-size:9px;color:white;background:var(--card-color);padding:4px 8px;border-radius:99px;font-weight:850}
+.card-title{font-size:16px;font-weight:850;color:#193e63}
+.card-count{margin-left:auto;font-size:10px;font-weight:800;color:#315574}
+.mini-bar{height:5px;background:#dfe9f0;border-radius:99px;margin:9px 0 0 48px;overflow:hidden}
+.mini-fill{height:100%;width:0;background:var(--card-color);border-radius:99px;transition:.25s}
+.description{font-size:10px;color:#587490;margin-top:6px}
+
+/* TASKS */
+.tasks{padding:4px 10px 9px}
+.task{
+  display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:8px;
+  min-height:32px;padding:5px 3px;
+  border-bottom:1px solid #edf2f6;cursor:pointer;
+}
+.task:last-child{border-bottom:0}
+.task:hover{background:#f8fbfd}
+.check{
+  width:14px;height:14px;border:1.5px solid var(--card-color);
+  border-radius:3px;display:grid;place-items:center;background:white;
+}
+.check.checked{background:var(--card-color)}
+.check.checked:after{content:"✓";font-size:9px;font-weight:900;color:white}
+.task-text{font-size:10.5px;line-height:1.35;color:#254d71}
+.task.done .task-text{text-decoration:line-through;color:#8da0b2}
+.task-tag{
+  font-size:8px;font-weight:800;padding:4px 7px;border-radius:99px;
+  background:var(--tag-bg);color:var(--card-color)
+}
+.show-more{
+  width:100%;border:0;background:transparent;color:var(--card-color);
+  font-size:9px;font-weight:850;padding:7px;cursor:pointer;text-align:left;
+}
+.hidden-task{display:none}
+
+/* FOOTER */
+.footer{
+  margin-top:20px;padding:17px 22px;border-radius:15px;
+  color:white;background:linear-gradient(110deg,#0a2948,#173f66);
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:15px;
+}
+.bulb{font-size:25px}.footer strong{font-size:12px}.footer p{font-size:10px;color:#aac4d9;margin-top:4px}
+.footer .cityline{margin-left:auto;font-style:italic;color:#d7e7f3;font-size:11px}
+
+/* MOBILE */
+@media(max-width:760px){
+ .container{width:calc(100% - 18px);padding-top:12px}
+ .hero{padding:25px 20px;min-height:190px}
+ .target{position:relative;right:auto;top:auto;margin-top:15px;width:145px}
+ .city{width:75%}
+ .progress-card{flex-wrap:wrap}
+ .actions{width:100%;justify-content:flex-start}
+ .grid{grid-template-columns:1fr;gap:12px}
+ .footer .cityline{display:none}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="hero">
+  <div class="city"></div>
+  <div class="hero-content">
+    <div class="kicker">Machine Learning Project</div>
+    <div class="title">NYC House <span>Type Classifier</span></div>
+    <div class="title" style="font-size:22px;margin-top:4px">Build Roadmap</div>
+    <div class="subtitle">🎯 From data to deployment, step by step, you got this!</div>
+  </div>
+  <div class="target">
+    <small>Target Column</small>
+    <strong>🎯 room_type</strong>
+    <em>3 classes</em>
+  </div>
+</header>
+
+<section class="progress-card">
+  <div class="ring" id="ring"><span id="percent">0%</span></div>
+  <div class="progress-main">
+    <div class="progress-line">
+      <span id="completedText">0 / 44 tasks completed</span>
+      <span class="muted" id="remainingText">44 remaining</span>
+    </div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="expandBtn">⌄ Expand All</button>
+    <button class="btn" id="collapseBtn">⌃ Collapse All</button>
+    <button class="btn complete" id="completeBtn">✓ Mark All Complete</button>
+    <button class="btn reset" id="resetBtn">↻ Reset</button>
+  </div>
+</section>
+
+<main class="grid" id="roadmap"></main>
+
+<footer class="footer">
+  <div class="bulb">💡</div>
+  <div>
+    <strong>Consistent effort beats talent when talent doesn't work hard.</strong>
+    <p>Build &nbsp; • &nbsp; Learn &nbsp; • &nbsp; Grow &nbsp; • &nbsp; Get Hired</p>
+  </div>
+  <div class="cityline">New York City ♡</div>
+</footer>
+</div>
+
+<script>
+const phases = [
+{
+ id:"data", stop:"Stop 1", title:"Data & EDA", icon:"▤", color:"#079b78", bg:"#e6faf4", tag:"#c8f2e6",
+ tasks:[
+ ["Download NYC Airbnb dataset from Kaggle","Data"],
+ ["Load dataset and run df.head(), df.info(), df.describe()","EDA"],
+ ["Check missing values with df.isnull().sum()","EDA"],
+ ["Check duplicates with df.duplicated().sum()","EDA"],
+ ["Plot room type distribution with countplot","EDA"],
+ ["Plot price vs room type with boxplot","EDA"],
+ ["Check skewness, especially the price column","EDA"],
+ ["Inspect numeric feature distributions","EDA"],
+ ["Check correlations between numeric features","EDA"],
+ ["Review target class balance","EDA"],
+ ["Document initial findings before cleaning","EDA"]
+ ]},
+{
+ id:"model", stop:"Stop 2", title:"Model Building", icon:"⚙", color:"#0879c9", bg:"#e8f5ff", tag:"#cceaff",
+ tasks:[
+ ["Drop useless columns: id, name, host_name, last_review","Clean"],
+ ["Handle missing values, including reviews_per_month fillna","Clean"],
+ ["Remove invalid / clearly impossible price values","Clean"],
+ ["Remove price outliers using the IQR method","Clean"],
+ ["Apply log1p transformation to price if skewness justifies it","Feature"],
+ ["Encode target column: room_type → LabelEncoder","Feature"],
+ ["Split X and y","Split"],
+ ["Train/test split 80/20 with stratify=y","Split"],
+ ["Build ColumnTransformer for numeric + categorical features","Pipeline"],
+ ["Train Logistic Regression as baseline model","Model"],
+ ["Train Random Forest classifier","Model"],
+ ["Compare accuracy, precision, recall and F1","Eval"],
+ ["Plot confusion matrix for the best model","Eval"],
+ ["Plot ROC curve using one-vs-rest","Eval"],
+ ["Tune model with RandomizedSearchCV","Tune"],
+ ["Save best model with joblib.dump(model, .pkl)","Save"]
+ ]},
+{
+ id:"api", stop:"Stop 3", title:"FastAPI", icon:"⬡", color:"#d97817", bg:"#fff4e7", tag:"#ffe0c2",
+ tasks:[
+ ["Install fastapi, uvicorn and pydantic","Setup"],
+ ["Create main.py and load the saved .pkl model","Setup"],
+ ["Build Pydantic input model with all required features","Schema"],
+ ["Build PredictionResponse model","Schema"],
+ ["Create GET / greeting route","Route"],
+ ["Create POST /predict route with prediction logic","Route"],
+ ["Add CORS middleware","Config"],
+ ["Test all routes in /docs, Swagger UI","Test"]
+ ]},
+{
+ id:"version", stop:"Stop 4", title:"Pickle / Versioning", icon:"▣", color:"#6949c6", bg:"#f3efff", tag:"#e4dcff",
+ tasks:[
+ ["Confirm sklearn versions match between Colab and VS Code","Version"],
+ ["Re-save model using the matching sklearn version","Save"],
+ ["Test that the model loads cleanly in VS Code","Test"],
+ ["Confirm prediction works after reload","Test"]
+ ]},
+{
+ id:"frontend", stop:"Stop 5", title:"Frontend (HTML + JS + CSS)", icon:"</>", color:"#087e91", bg:"#e9fbff", tag:"#c8f4f7",
+ tasks:[
+ ["Create index.html with prediction form","HTML"],
+ ["Add all input fields, neighbourhood, price, etc.","HTML"],
+ ["Write JS fetch() to POST data to /predict","JS"],
+ ["Display prediction result clearly on the page","JS"],
+ ["Handle API errors in the UI","JS"],
+ ["Style form cleanly with responsive CSS","CSS"],
+ ["Test frontend with local FastAPI","Test"],
+ ["Verify all fields match the Pydantic schema","Test"]
+ ]},
+{
+ id:"deploy", stop:"Stop 6", title:"Deploy & Portfolio", icon:"☁", color:"#d33668", bg:"#fff0f4", tag:"#ffd4df",
+ tasks:[
+ ["Create requirements.txt","Setup"],
+ ["Create clean README.md with project explanation","GitHub"],
+ ["Push code to GitHub repo","GitHub"],
+ ["Deploy FastAPI on Render or Railway (free)","Deploy"],
+ ["Test live URL and /docs","Test"],
+ ["Test live prediction endpoint","Test"],
+ ["Take screenshots for LinkedIn post","Portfolio"],
+ ["Write LinkedIn post with GitHub + live link","Portfolio"]
+ ]}
+];
+
+const STORAGE_KEY="nyc_house_classifier_color_roadmap_v1";
+let state=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");
+let expanded={};
+
+function total(){return phases.reduce((n,p)=>n+p.tasks.length,0)}
+function doneCount(){return Object.values(state).filter(Boolean).length}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function percent(){return Math.round(doneCount()/total()*100)}
+
+function render(){
+ const root=document.getElementById("roadmap");
+ root.innerHTML="";
+ phases.forEach((p,pi)=>{
+   const done=p.tasks.filter((_,i)=>state[p.id+"_"+i]).length;
+   const card=document.createElement("section");
+   card.className="card";
+   card.style.setProperty("--card-color",p.color);
+   card.style.setProperty("--card-bg",p.bg);
+   card.style.setProperty("--tag-bg",p.tag);
+   card.style.setProperty("--card-border",p.color+"55");
+
+   const head=document.createElement("div");
+   head.className="card-head";
+   head.innerHTML=`
+     <div class="head-row">
+       <div class="icon">${p.icon}</div>
+       <div>
+         <span class="stop">${p.stop}</span>
+         <div class="card-title">${p.title}</div>
+       </div>
+       <div class="card-count">${done}/${p.tasks.length}<br><small>${Math.round(done/p.tasks.length*100)}%</small></div>
+     </div>
+     <div class="mini-bar"><div class="mini-fill" style="width:${done/p.tasks.length*100}%"></div></div>
+     <div class="description">${description(p.id)}</div>
+   `;
+   card.appendChild(head);
+
+   const tasks=document.createElement("div");
+   tasks.className="tasks";
+   const isExpanded=expanded[p.id]===true;
+   const limit=5;
+
+   p.tasks.forEach((t,i)=>{
+     const row=document.createElement("div");
+     const key=p.id+"_"+i;
+     const isDone=!!state[key];
+     row.className="task"+(isDone?" done":"")+(i>=limit&&!isExpanded?" hidden-task":"");
+     row.innerHTML=`
+       <div class="check ${isDone?"checked":""}"></div>
+       <div class="task-text">${t[0]}</div>
+       <div class="task-tag">${t[1]}</div>`;
+     row.onclick=()=>{
+       state[key]=!state[key]; save(); render(); update();
+     };
+     tasks.appendChild(row);
+   });
+
+   if(p.tasks.length>limit){
+     const more=document.createElement("button");
+     more.className="show-more";
+     more.textContent=isExpanded?"⌃ Show less":"⌄ Show "+(p.tasks.length-limit)+" more";
+     more.onclick=()=>{expanded[p.id]=!isExpanded;render()};
+     tasks.appendChild(more);
+   }
+   card.appendChild(tasks);
+   root.appendChild(card);
+ });
+ update();
+}
+
+function description(id){
+ return {
+  data:"Explore the dataset, understand the data and prepare for modeling.",
+  model:"Prepare data, build ML pipeline and train models.",
+  api:"Build the backend API to serve the ML model.",
+  version:"Handle model versioning and compatibility.",
+  frontend:"Build the user interface to interact with the model.",
+  deploy:"Deploy the app and create a portfolio for showcase."
+ }[id];
+}
+
+function update(){
+ const d=doneCount(), t=total(), pct=Math.round(d/t*100);
+ document.getElementById("completedText").textContent=`${d} / ${t} tasks completed`;
+ document.getElementById("remainingText").textContent=`${t-d} remaining`;
+ document.getElementById("percent").textContent=pct+"%";
+ document.getElementById("barFill").style.width=pct+"%";
+ document.getElementById("ring").style.background=
+   `conic-gradient(#54dce9 ${pct*3.6}deg,#1e547d ${pct*3.6}deg)`;
+}
+
+document.getElementById("completeBtn").onclick=()=>{
+ phases.forEach(p=>p.tasks.forEach((_,i)=>state[p.id+"_"+i]=true));
+ save();render();
+};
+document.getElementById("resetBtn").onclick=()=>{
+ if(confirm("Reset all roadmap progress? Your completed tasks will be unchecked.")){
+   state={};save();render();
+ }
+};
+document.getElementById("expandBtn").onclick=()=>{
+ phases.forEach(p=>expanded[p.id]=true);render();
+};
+document.getElementById("collapseBtn").onclick=()=>{
+ phases.forEach(p=>expanded[p.id]=false);render();
+};
+
+render();
+</script>
+</body>
+</html>
